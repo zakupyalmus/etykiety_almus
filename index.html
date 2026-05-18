@@ -472,7 +472,6 @@ async function processNext() {
 async function processFile(file) {
   const isPDF = file.type === 'application/pdf';
 
-  // Reset UI
   clearFields();
   setStatus('scanning', 'Skanowanie...');
   document.getElementById('scan-overlay').classList.add('active');
@@ -483,11 +482,12 @@ async function processFile(file) {
   let base64, mimeType;
 
   if (isPDF) {
-    img.src = ''; 
+    img.style.display = 'none';
     base64 = await fileToBase64(file);
     mimeType = 'application/pdf';
   } else {
     img.src = URL.createObjectURL(file);
+    img.style.display = 'block';
     base64 = await fileToBase64(file);
     mimeType = file.type || 'image/jpeg';
   }
@@ -514,7 +514,7 @@ async function processFile(file) {
       parsed = JSON.parse(text.trim()); 
     } 
     catch(e) { 
-      console.error('JSON parse error:', e, 'Raw text:', text); 
+      console.error('Błąd parsowania JSON:', e); 
     }
     fillFields(parsed);
     setStatus('done', '✓ Odczytano');
@@ -541,14 +541,19 @@ function fileToBase64(file) {
 function setStatus(type, text) {
   const chip = document.getElementById('status-chip');
   chip.className = 'status-chip ' + type;
-  chip.innerHTML = type === 'scanning'
-    ? '<div class="spinner"></div> ' + text
-    : text;
+  if (type === 'scanning') {
+    chip.innerHTML = '<div class="spinner"></div> ' + text;
+  } else {
+    chip.innerHTML = text;
+  }
 }
 
 function clearFields() {
-  ['reel','batch','gsm','width','ply','net','gross','length','diameter','core','order','seq','line','delivery','opening']
-    .forEach(id => { const el = document.getElementById('f-'+id); el.value = ''; el.className = ''; });
+  const fields = ['reel','batch','gsm','width','ply','net','gross','length','diameter','core','order','seq','line','delivery','opening'];
+  fields.forEach(id => { 
+    const el = document.getElementById('f-'+id); 
+    if(el) { el.value = ''; el.className = ''; }
+  });
 }
 
 function fillFields(d) {
@@ -561,8 +566,10 @@ function fillFields(d) {
   };
   Object.entries(map).forEach(([id, val]) => {
     const el = document.getElementById('f-'+id);
-    el.value = val || '';
-    el.className = val ? 'filled' : '';
+    if(el) {
+      el.value = val || '';
+      el.className = val ? 'filled' : '';
+    }
   });
 }
 
@@ -615,6 +622,7 @@ async function approve() {
   document.getElementById('btn-skip').disabled = true;
   dz.classList.remove('has-image');
   document.getElementById('preview-img').src = '';
+  document.getElementById('preview-img').style.display = 'none';
 
   if (queue.length) processNext();
 }
@@ -626,6 +634,7 @@ function skipCurrent() {
   document.getElementById('btn-skip').disabled = true;
   dz.classList.remove('has-image');
   document.getElementById('preview-img').src = '';
+  document.getElementById('preview-img').style.display = 'none';
   if (queue.length) processNext();
 }
 
