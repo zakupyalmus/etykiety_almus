@@ -1,8 +1,3 @@
-Oto kompletny, gotowy do skopiowania kod całego pliku `index.html`. Usunąłem z niego całkowicie problematyczną bibliotekę `pdf.js` oraz poprawiłem formatowanie tekstu w JavaScript, dzięki czemu nie zobaczysz już żadnych błędów typu `SyntaxError` ani blokad prywatności.
-
-Zaznacz cały poniższy tekst, skopiuj go i wklej na GitHubie (zastępując całą dotychczasową zawartość pliku):
-
-```html
 <!DOCTYPE html>
 <html lang="pl">
 <head>
@@ -425,7 +420,7 @@ Zaznacz cały poniższy tekst, skopiuj go i wklej na GitHubie (zastępując cał
 const GEMINI_KEY = 'AIzaSyB6adS4yDSxmHRLsAZtSvt8QBB5NFCyFTk';
 const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + GEMINI_KEY;
 const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbz3P5Svtm5wRId7JjMlb3O5GixXDVkwPOTtmWJTcuc-kQy9R4QKDf9CLL-InWhvPuYCXA/exec';
-const PROMPT = 'Jesteś systemem OCR do etykiet produkcyjnych w fabryce papieru higienicznego. Odczytaj dane z etykiety i zwróć TYLKO obiekt JSON (bez żadnego tekstu ani markdown), z dokładnie tymi polami:\\n{"reel_no":"","batch_no":"","gsm":"","width_mm":"","ply":"","net_weight_kg":"","gross_weight_kg":"","roll_length_m":"","diameter_mm":"","core":"","order_no":"","roll_sequence":"","production_line":"","delivery_date":"","opening_date":""}\\nJeśli pole jest nieczytelne lub niewidoczne wpisz pusty string. Nie zgaduj. Zwróć tylko JSON.';
+const PROMPT = 'Jesteś systemem OCR do etykiet produkcyjnych w fabryce papieru higienicznego. Odczytaj dane z etykiety i zwróć TYLKO obiekt JSON (bez żadnego tekstu ani markdown), z dokładnie tymi polami:\n{"reel_no":"","batch_no":"","gsm":"","width_mm":"","ply":"","net_weight_kg":"","gross_weight_kg":"","roll_length_m":"","diameter_mm":"","core":"","order_no":"","roll_sequence":"","production_line":"","delivery_date":"","opening_date":""}\nJeśli pole jest nieczytelne lub niewidoczne wpisz pusty string. Nie zgaduj. Zwróć tylko JSON.';
 
 // ── STAN ──────────────────────────────────────────────────
 const db = [];
@@ -655,9 +650,9 @@ function exportCSV() {
   const rows = db.map((r,i) => [i+1, r.reel_no, r.batch_no, r.gsm, r.width_mm, r.ply, r.net_kg, r.gross_kg, r.length_m, r.diameter_mm, r.core, r.order_no, r.roll_seq, r.line, r.delivery_date, r.opening_date, r.saved_at]);
   const csv = [headers].concat(rows)
     .map(row => row.map(v => '"' + (v||'').toString().replace(/"/g,'""') + '"').join(','))
-    .join('\\n');
+    .join('\n');
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(new Blob(['\\uFEFF'+csv], {type:'text/csv;charset=utf-8;'}));
+  a.href = URL.createObjectURL(new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8;'}));
   a.download = 'etykiety_' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
   showToast('⬇ CSV gotowy');
